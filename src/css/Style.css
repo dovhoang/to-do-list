@@ -1,0 +1,24 @@
+span {
+    padding: 5px 10px ;
+    color: white !important;
+    border-radius: 5px;
+    font-size: 12px ;
+}
+
+#pHigh {
+ background-color: red;
+}
+#pMedium {
+ background-color: goldenrod;
+}
+#pLow {
+ background-color: gray;
+}
+
+.card-body{
+    padding: 0px;
+}
+
+.card-header{
+    text-align: start;
+}
