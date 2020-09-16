@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import '../css/Style.css'
 class Item extends Component {
+    constructor(props) {
+        super(props);
+    }
     showPirioty(item) {
         if (item.pirioty === 0) {
             return <span id="pHigh">High</span>
@@ -10,6 +13,15 @@ class Item extends Component {
             return <span id="pLow">Low</span>
         }
     }
+
+    handleDelete(id) {
+        this.props.onClickDelete(id);
+    }
+
+    handleUpdate(id) {
+        this.props.onClickUpdate(id);
+    }
+
     render() {
         var item = this.props.item;
         return (
@@ -19,8 +31,8 @@ class Item extends Component {
                 <td> {this.showPirioty(item)}</td>
                 <td >
                     <div className="row d-flex justify-content-around">
-                        <button type="button" className="btn btn-outline-info"><i className="fa fa-pencil" aria-hidden="true" /></button>
-                        <button type="button" className="btn btn-outline-danger"><i className="fa fa-trash" aria-hidden="true" /></button>
+                        <button onClick={() => { this.handleUpdate(item) }} type="button" className="btn btn-outline-info"><i className="fa fa-pencil" aria-hidden="true" /></button>
+                        <button onClick={() => { this.handleDelete(item.id) }} type="button" className="btn btn-outline-danger"><i className="fa fa-trash" aria-hidden="true" /></button>
                     </div>
                 </td>
             </tr>

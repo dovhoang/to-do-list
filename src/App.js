@@ -5,7 +5,7 @@ import Control from './components/Control';
 import Table from './components/Table';
 import Form from './components/Form';
 import _ from 'lodash'
-const listTagsFull = [
+var listTagsFull = [
   {
     id: 0,
     name: "Do reactJS exercises",
@@ -26,50 +26,36 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      items: listTagsFull,
       isFormShow: false,
       searchStr: '',
-      sort: null
+      sort: null,
+      dataUpdate: null,
     };
     this.handleToggleForm = this.handleToggleForm.bind(this);
     this.handleSearch = this.handleSearch.bind(this);
     this.handleSort = this.handleSort.bind(this);
+    this.handleDelete = this.handleDelete.bind(this);
+    this.handleSubmitAddTag = this.handleSubmitAddTag.bind(this);
+    this.handleUpdate = this.handleUpdate.bind(this);
+    this.onClickCancel = this.onClickCancel.bind(this);
 
   }
   handleToggleForm() {
-    this.setState({ isFormShow: !this.state.isFormShow })
+    this.setState({
+      isFormShow: !this.state.isFormShow,
+      dataUpdate: null
+    })
   }
 
   handleSearch(value) {
-    this.setState(
-      {
-        searchStr: value,
-        sort: null
-      }
-
+    this.setState({
+      searchStr: value,
+      sort: null
+    }
     );
-
-  }
-
-  handleSort(option) {
-    this.setState({ sort: option })
-  }
-
-  handleSubmitAddTag(name, pirioty) {
-
-    listTagsFull.push(
-      {
-        id: 0,
-        name: name,
-        pirioty: pirioty,
-      }
-    );
-  }
-  render() {
-    let elmForm = null;
-    let isShowForm = this.state.isFormShow;
-    let listTag = [];
-    let searchStr = this.state.searchStr;
-    let sort = this.state.sort;
+    let listTag = this.state.items;
+    let searchStr = value;
     if (searchStr.length > 0) {
       listTag = _.filter(listTagsFull, (item) => {
         return _.includes(item.name.toLowerCase(), searchStr.toLowerCase());
@@ -77,18 +63,88 @@ class App extends Component {
     } else {
       listTag = listTagsFull;
     }
-    if (isShowForm) {
-      elmForm = <Form onClickSubmitForm={this.handleToggleForm} />
-    }
-    if (sort !== null) {
-      console.log(sort);
-      if (sort) {
+    this.setState({ items: listTag })
+
+  }
+
+  handleSort(option) {
+    this.setState({ sort: option })
+    let listTag = this.state.items;
+    if (option !== null) {
+      if (option) {
         listTag = _.orderBy(listTag, ['name', 'id'], ['asc', 'asc']);
       } else {
         listTag = _.orderBy(listTag, ['name', 'id'], ['desc', 'desc']);
       }
-
     }
+    this.setState({ items: listTag })
+  }
+
+
+
+  handleSubmitAddTag(id, name, pirioty) {
+    console.log(id, name, pirioty)
+    let list = this.state.items;
+    if (id === -1) {
+      let maxId = list.reduce(
+        (max, character) => (character.id > max ? character.id : max),
+        list[0].id
+      );
+      list.push(
+        {
+          id: maxId + 1,
+          name: name,
+          pirioty: parseInt(pirioty),
+        }
+      );
+    } else {
+      let index = list.findIndex(tag => tag.id === id)
+      list.splice(index, 1, { id, name, pirioty })
+    }
+
+    this.setState({ items: list })
+  };
+
+  handleDelete(id) {
+
+    let listTags = this.state.items.filter(x => {
+      return x.id !== id;
+    })
+    this.setState({
+      items: listTags
+    })
+  }
+
+  handleUpdate(item) {
+    console.log('update')
+    this.setState({
+      isFormShow: true,
+      dataUpdate: item
+    });
+
+  }
+
+  onClickCancel() {
+    this.setState({
+      isFormShow: false,
+      dataUpdate: null
+    })
+  }
+
+
+  render() {
+    let elmForm = null;
+    let isShowForm = this.state.isFormShow;
+
+    if (isShowForm) {
+      elmForm = <Form
+        onClickSubmitForm={this.handleSubmitAddTag}
+        onClickAddTag={this.handleToggleForm}
+        onClickCancel={this.onClickCancel}
+        dataUpdate={this.state.dataUpdate}
+      />
+    }
+
     return (
       <div className="App ">
         <div className="row justify-content-center">
@@ -98,14 +154,16 @@ class App extends Component {
               onClickAddTag={this.handleToggleForm}
               onClickSearch={this.handleSearch}
               onClickSort={this.handleSort}
-              onClickSubmitAddTag={this.handleSubmitAddTag}
             />
             <div className="row justify-content-end">
               <div className="col-md-6">
                 {elmForm}
               </div>
             </div>
-            <Table items={listTag} />
+            <Table
+              onClickDelete={this.handleDelete}
+              onClickUpdate={this.handleUpdate}
+              items={this.state.items} />
           </div>
         </div>
       </div>

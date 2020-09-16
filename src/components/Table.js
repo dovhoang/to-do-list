@@ -6,7 +6,11 @@ class Table extends Component {
   render() {
     let items = this.props.items;
     var showTag = items.map((item, index) =>
-      <Item key={index} item={item} />
+      <Item key={index}
+        item={item}
+        onClickDelete={this.props.onClickDelete}
+        onClickUpdate={this.props.onClickUpdate}
+      />
     );
     return (
       <div className="row justify-content-center mt-4">
